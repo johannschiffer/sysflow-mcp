@@ -1,0 +1,2 @@
+# Zero external runtime dependencies!
+# SysFlow Lite operates purely on Python standard library and Linux procfs/systemd

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sysflow-mcp"
+version = "1.0.0"
+description = "Safe Linux Sysadmin, Process & Build Automation Engine for AI Agents"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Johann Schiffer"}
+]
+keywords = ["mcp", "model-context-protocol", "sysadmin", "linux", "systemd", "claude", "cursor", "monitoring", "ai-agent"]
+dependencies = []
+
+[project.scripts]
+sysflow-mcp = "sysflow.server:main"
+sysflow-cli = "sysflow.cli:main"
