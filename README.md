@@ -1,7 +1,7 @@
 # SysFlow MCP (Lite Edition)
 
-> **Free:** [Genesis Starter Kit](https://johanld.gumroad.com/l/khffw) (25 `.cursorrules`/`CLAUDE.md` rulesets + MCP configs). Try the [live config builder](https://johannschiffer.github.io).
-> **Full stack:** all six servers in [Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/tzuvz).
+> **Free:** [Genesis Starter Kit](https://johanld.gumroad.com/l/genesis-starter-kit) (25 `.cursorrules`/`CLAUDE.md` rulesets + MCP configs). Try the [live config builder](https://johannschiffer.github.io).
+> **Full stack:** all six servers in [Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/genesis-enterprise-suite).
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -120,7 +120,7 @@ Looking to automate shell task execution, manage Docker containers, or generate 
 | **Production Docker Container** | ❌ | ✅ |
 | **Full Pytest Suite & Sysadmin Automation Guide** | ❌ | ✅ |
 
-👉 **[Get the Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/tzuvz)**
+👉 **[Get the Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/genesis-enterprise-suite)**
 
 ---
 
@@ -146,4 +146,4 @@ VPS hosting that work well with SysFlow MCP. Some links are referral links.
 | **SysFlow MCP** (this repo) | Safe Linux administration plane: systemd, port audit, isolated execution | [GitHub](https://github.com/johannschiffer/sysflow-mcp) |
 | **FastMCP Forge** | Production MCP server scaffolder: stdio, SSE and auth middleware | [GitHub](https://github.com/johannschiffer/fastmcp-forge) |
 
-[Live config builder](https://johannschiffer.github.io) | [Starter Kit, free](https://johanld.gumroad.com/l/khffw) | [Enterprise Suite, $19](https://johanld.gumroad.com/l/tzuvz)
+[Live config builder](https://johannschiffer.github.io) | [Starter Kit, free](https://johanld.gumroad.com/l/genesis-starter-kit) | [Enterprise Suite, $19](https://johanld.gumroad.com/l/genesis-enterprise-suite)
