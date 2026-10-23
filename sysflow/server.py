@@ -165,6 +165,13 @@ class SysFlowMCPServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(
+        prog="sysflow-mcp",
+        description="SysFlow MCP: Safe Linux Sysadmin, Process & Build Automation Engine for AI Agents"
+    )
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.0")
+    args, unknown = parser.parse_known_args()
     server = SysFlowMCPServer()
     server.run_stdio()
 
