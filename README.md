@@ -1,5 +1,9 @@
 # SysFlow MCP (Lite Edition)
 
+> **Free:** [Genesis Starter Kit](https://johanld.gumroad.com/l/khffw) (25 `.cursorrules`/`CLAUDE.md` rulesets + MCP configs). Try the [live config builder](https://johannschiffer.github.io).
+> **Full stack:** all six servers in [Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/tzuvz).
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-brightgreen.svg)](https://python.org)
 [![MCP Compliant](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io)
@@ -7,6 +11,31 @@
 **SysFlow MCP** is a lightweight, zero-overhead Model Context Protocol server that gives AI agents in **Claude Desktop**, **Cursor**, **Windsurf**, and **Antigravity** safe, structured access to Linux sysadmin inspection, log tailing, and service health without granting unrestricted root shells or risking interactive terminal freezes.
 
 ---
+
+## Run without cloning
+
+```bash
+uvx --from git+https://github.com/johannschiffer/sysflow-mcp sysflow-mcp
+```
+
+Claude Desktop / Cursor config entry:
+
+```json
+{
+  "mcpServers": {
+    "sysflow-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/johannschiffer/sysflow-mcp",
+        "sysflow-mcp"
+      ]
+    }
+  }
+}
+```
+
+[![CI](https://github.com/johannschiffer/sysflow-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/johannschiffer/sysflow-mcp/actions/workflows/ci.yml)
 
 ## 🖥️ Why SysFlow MCP?
 
@@ -79,7 +108,7 @@ python -m sysflow.cli resources
 
 Looking to automate shell task execution, manage Docker containers, or generate verified systemd units?
 
-| Feature | Lite (Open Source) | Pro ($14.99 USD) |
+| Feature | Lite (Open Source) | Enterprise Suite ($19) |
 |---|:---:|:---:|
 | **CPU, RAM & Disk Monitoring** | ✅ | ✅ |
 | **Safe Bounded Log Tailer** | ✅ | ✅ |
@@ -91,10 +120,30 @@ Looking to automate shell task execution, manage Docker containers, or generate 
 | **Production Docker Container** | ❌ | ✅ |
 | **Full Pytest Suite & Sysadmin Automation Guide** | ❌ | ✅ |
 
-👉 **[Get SysFlow Pro on Gumroad ($14.99)](https://johanld.gumroad.com/l/sysflow-mcp-pro)**
+👉 **[Get the Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/tzuvz)**
 
 ---
 
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+## Recommended Infrastructure
+
+VPS hosting that work well with SysFlow MCP. Some links are referral links.
+
+- [Hetzner Cloud](https://www.hetzner.com/cloud)
+- [DigitalOcean](https://www.digitalocean.com/)
+
+## Genesis MCP Ecosystem
+
+| Module | What it does | Repo |
+|---|---|---|
+| **CrawlEngine MCP** | Anti-bot web scraping, clean Markdown, proxy rotation and TLS evasion | [GitHub](https://github.com/johannschiffer/crawlengine-mcp) |
+| **BrowserBridge MCP** | Deterministic headless browser automation with cryptographic action receipts | [GitHub](https://github.com/johannschiffer/browserbridge-mcp) |
+| **PgSafe MCP** | Zero-trust PostgreSQL/SQLite guard, live PII masking, zero-downtime migration checks | [GitHub](https://github.com/johannschiffer/pgsafe-mcp) |
+| **OmniBridge MCP** | Multi-channel notification and webhook bus with a persistent SQLite WAL queue | [GitHub](https://github.com/johannschiffer/omnibridge-mcp) |
+| **SysFlow MCP** (this repo) | Safe Linux administration plane: systemd, port audit, isolated execution | [GitHub](https://github.com/johannschiffer/sysflow-mcp) |
+| **FastMCP Forge** | Production MCP server scaffolder: stdio, SSE and auth middleware | [GitHub](https://github.com/johannschiffer/fastmcp-forge) |
+
+[Live config builder](https://johannschiffer.github.io) | [Starter Kit, free](https://johanld.gumroad.com/l/khffw) | [Enterprise Suite, $19](https://johanld.gumroad.com/l/tzuvz)
