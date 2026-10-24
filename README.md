@@ -6,6 +6,7 @@
 
 
 
+[![Release](https://img.shields.io/github/v/release/johannschiffer/sysflow-mcp?include_prereleases&color=blue)](https://github.com/johannschiffer/sysflow-mcp/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-brightgreen.svg)](https://python.org)
 [![MCP Compliant](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io)
@@ -24,8 +25,14 @@
 
 ## Run without cloning
 
+Execute directly via `uvx` (PyPI direct or Git source):
+
 ```bash
+# Direct PyPI invocation:
 uvx sysflow-mcp
+
+# Or direct Git invocation (pre-PyPI sync):
+uvx --from git+https://github.com/johannschiffer/sysflow-mcp sysflow-mcp
 ```
 
 Claude Desktop / Cursor config entry:
@@ -36,14 +43,14 @@ Claude Desktop / Cursor config entry:
     "sysflow-mcp": {
       "command": "uvx",
       "args": [
-        "--from",
-        "git+https://github.com/johannschiffer/sysflow-mcp",
         "sysflow-mcp"
       ]
     }
   }
 }
 ```
+*(Alternative for pre-indexation: replace `"args": ["sysflow-mcp"]` with `"args": ["--from", "git+https://github.com/johannschiffer/sysflow-mcp", "sysflow-mcp"]`)*
+
 
 [![CI](https://github.com/johannschiffer/sysflow-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/johannschiffer/sysflow-mcp/actions/workflows/ci.yml)
 
