@@ -20,7 +20,7 @@
 ## Run without cloning
 
 ```bash
-uvx --from git+https://github.com/johannschiffer/sysflow-mcp sysflow-mcp
+uvx sysflow-mcp
 ```
 
 Claude Desktop / Cursor config entry:
