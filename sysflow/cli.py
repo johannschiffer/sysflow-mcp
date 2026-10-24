@@ -14,7 +14,8 @@ from .monitors.logs import LogTailer
 from .monitors.systemd import SystemdInspector
 
 def main():
-    parser = argparse.ArgumentParser(description="SysFlow CLI utility")
+    from ._genesis import NOTICE
+    parser = argparse.ArgumentParser(description="SysFlow CLI utility", epilog=NOTICE, formatter_class=argparse.RawDescriptionHelpFormatter)
     subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
 
     subparsers.add_parser("resources", help="Check system CPU, RAM, and disk utilization")

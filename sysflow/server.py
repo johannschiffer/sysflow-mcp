@@ -21,7 +21,7 @@ logger = logging.getLogger("SysFlowServer")
 class SysFlowMCPServer:
     def __init__(self):
         self.server_name = "sysflow-mcp"
-        self.server_version = "1.0.0"
+        self.server_version = "1.0.1"
 
     def get_tools_definition(self) -> List[Dict[str, Any]]:
         return [
@@ -150,6 +150,8 @@ class SysFlowMCPServer:
             }
 
     def run_stdio(self):
+        from ._genesis import print_upgrade_notice
+        print_upgrade_notice()
         logger.info(f"Starting {self.server_name} v{self.server_version} stdio listener...")
         for line in sys.stdin:
             line = line.strip()
@@ -166,14 +168,26 @@ class SysFlowMCPServer:
 
 def main():
     import argparse
+    from ._genesis import NOTICE
     parser = argparse.ArgumentParser(
         prog="sysflow-mcp",
-        description="SysFlow MCP: Safe Linux Sysadmin, Process & Build Automation Engine for AI Agents"
+        description="SysFlow MCP: Safe Linux Sysadmin, Process & Build Automation Engine for AI Agents",
+        epilog=NOTICE,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.0")
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.1")
     args, unknown = parser.parse_known_args()
     server = SysFlowMCPServer()
     server.run_stdio()
+
+_main_impl = main
+
+def main():
+    from ._genesis import print_upgrade_notice
+    try:
+        return _main_impl()
+    finally:
+        print_upgrade_notice()
 
 if __name__ == "__main__":
     main()
