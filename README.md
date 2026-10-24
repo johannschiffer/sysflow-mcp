@@ -1,5 +1,10 @@
 # SysFlow MCP (Lite Edition)
 
+<a href="https://glama.ai/mcp/servers/@johannschiffer/sysflow-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@johannschiffer/sysflow-mcp/badge" alt="sysflow-mcp MCP server" />
+</a>
+
+
 > **Free:** [Genesis Starter Kit](https://johanld.gumroad.com/l/genesis-starter-kit) (25 `.cursorrules`/`CLAUDE.md` rulesets + MCP configs). Try the [live config builder](https://johannschiffer.github.io).
 > **Full stack:** all six servers in [Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/genesis-enterprise-suite).
 
