@@ -1,5 +1,5 @@
 """
-SysFlow MCP: Model Context Protocol Server (Enterprise Pro Edition)
+SysFlow MCP: Model Context Protocol Server
 Includes System Resource Monitor, Safe Log Tailer, Systemd Inspector,
 Sandboxed Task Runner with Timeouts, Unit Generator, and Port Auditor.
 """
@@ -17,14 +17,14 @@ from .core.port_auditor import PortAuditor
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] [SysFlow-Pro] %(message)s",
+    format="%(asctime)s [%(levelname)s] [SysFlow] %(message)s",
     stream=sys.stderr
 )
-logger = logging.getLogger("SysFlowProServer")
+logger = logging.getLogger("SysFlowServer")
 
-class SysFlowProServer:
+class SysFlowServer:
     def __init__(self):
-        self.server_name = "sysflow-mcp-pro"
+        self.server_name = "sysflow-mcp"
         self.server_version = "1.0.0"
 
     def get_tools_definition(self) -> List[Dict[str, Any]]:
@@ -141,7 +141,7 @@ class SysFlowProServer:
 
         if req_id is None:
             if method == "notifications/initialized":
-                logger.info("Pro client completed initialization handshake.")
+                logger.info("Client completed initialization handshake.")
             return None
 
         if method == "initialize":
@@ -216,7 +216,7 @@ class SysFlowProServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    server = SysFlowProServer()
+    server = SysFlowServer()
     server.run_stdio()
 
 if __name__ == "__main__":

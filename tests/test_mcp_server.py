@@ -1,12 +1,12 @@
 """
-Unit tests for SysFlow Pro MCP Server JSON-RPC protocol compliance.
+Unit tests for SysFlow MCP Server JSON-RPC protocol compliance.
 """
 import pytest
 import json
-from sysflow.server import SysFlowProServer
+from sysflow.server import SysFlowServer
 
 def test_mcp_initialize():
-    server = SysFlowProServer()
+    server = SysFlowServer()
     req = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -19,10 +19,10 @@ def test_mcp_initialize():
     }
     resp = server.handle_request(req)
     assert resp["id"] == 1
-    assert resp["result"]["serverInfo"]["name"] == "sysflow-mcp-pro"
+    assert resp["result"]["serverInfo"]["name"] == "sysflow-mcp"
 
 def test_mcp_tools_list():
-    server = SysFlowProServer()
+    server = SysFlowServer()
     req = {
         "jsonrpc": "2.0",
         "id": 2,
@@ -41,7 +41,7 @@ def test_mcp_tools_list():
     assert "audit_listening_ports" in names
 
 def test_mcp_check_resources():
-    server = SysFlowProServer()
+    server = SysFlowServer()
     req = {
         "jsonrpc": "2.0",
         "id": 3,

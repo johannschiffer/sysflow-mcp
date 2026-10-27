@@ -1,5 +1,5 @@
 """
-Systemd Unit Generator & Validator (SysFlow Pro Core).
+Systemd Unit Generator & Validator.
 Creates validated .service and .timer units for background tasks and automated cron schedules.
 """
 from typing import Dict, Any, Optional

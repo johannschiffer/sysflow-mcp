@@ -1,5 +1,5 @@
 """
-Listening Port and Socket Conflict Auditor (SysFlow Pro Core).
+Listening Port and Socket Conflict Auditor.
 Scans active listening network ports to diagnose binding conflicts and unauthorized listeners without root.
 """
 import os

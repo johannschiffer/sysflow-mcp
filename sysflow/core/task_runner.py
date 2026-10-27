@@ -1,5 +1,5 @@
 """
-Sandboxed Task Runner with Hard Timeouts (SysFlow Pro Core).
+Sandboxed Task Runner with Hard Timeouts.
 Enforces non-interactive execution, captures stdout/stderr, and prevents terminal freezes.
 """
 import os

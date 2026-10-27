@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sysflow-mcp"
-version = "2.0.0"
+version = "1.0.0"
 description = "Safe Linux administration plane, systemd inspection, port auditing, and isolated task execution for AI agents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,8 +26,8 @@ sysflow-cli = "sysflow.cli:main"
 include = ["sysflow*"]
 
 [project.urls]
-Homepage = "https://johannschiffer.github.io"
-Documentation = "https://johannschiffer.github.io"
+Homepage = "https://github.com/johannschiffer/sysflow-mcp"
+Documentation = "https://github.com/johannschiffer/sysflow-mcp#readme"
 Repository = "https://github.com/johannschiffer/sysflow-mcp"
 Issues = "https://github.com/johannschiffer/sysflow-mcp/issues"
 Funding = "https://ko-fi.com/johannschiffer"
