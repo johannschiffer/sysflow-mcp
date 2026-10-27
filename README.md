@@ -72,8 +72,12 @@ Giving an AI assistant raw terminal execution often ends in frustration:
 - 📊 **Resource Healthcheck**: Reports CPU core load averages (1m, 5m, 15m), RAM availability (MB and percentage), and disk partition metrics.
 - 📜 **Safe Log Tailer**: Reads the last N lines (bounded and memory-safe) with optional regex filtering; automatically rejects binary files.
 - ⚙️ **Systemd User Service Inspector**: Lists user-level services and timers (`systemctl --user`), highlighting failed units without requiring `sudo`.
+- ⏱️ **Sandboxed Task Runner with Timeouts**: Anti-freeze execution plane for shell tasks.
+- 🐳 **Docker Container Health & Log Inspector**: Inspects container states, health status, and logs.
+- 📄 **Verified Systemd Unit File Generator**: Generates clean, secure service unit files.
+- 🔌 **Listening Socket & Port Conflict Auditor**: Discovers active listening ports and detects binding collisions.
+- 🐳 **Production Docker Container**: Containerized system observability plane.
 - 🪶 **Zero External Dependencies**: Operates strictly on Python standard library and Linux `/proc` filesystem.
-
 ---
 
 ## 🚀 Quick Setup in 2 Minutes
@@ -123,24 +127,6 @@ python -m sysflow.cli resources
 
 ---
 
-## 💎 Need Enterprise Build Sandboxing? Upgrade to SysFlow Pro
-
-Looking to automate shell task execution, manage Docker containers, or generate verified systemd units?
-
-| Feature | v1.0 (Legacy) | v2.0 (Open Source) |
-|---|:---:|:---:|
-| **CPU, RAM & Disk Monitoring** | ✅ | ✅ |
-| **Safe Bounded Log Tailer** | ✅ | ✅ |
-| **Systemd User Service Auditing** | ✅ | ✅ |
-| **Sandboxed Task Runner with Timeouts** *(Anti-freeze)* | ❌ | ✅ |
-| **Docker Container Health & Log Inspector** | ❌ | ✅ |
-| **Verified Systemd Unit File Generator** | ❌ | ✅ |
-| **Listening Socket & Port Conflict Auditor** | ❌ | ✅ |
-| **Production Docker Container** | ❌ | ✅ |
-| **Full Pytest Suite & Sysadmin Automation Guide** | ❌ | ✅ |
-
----
-
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
@@ -172,3 +158,11 @@ VPS hosting that work well with SysFlow MCP. Some links are referral links.
   - **High-Performance VPS & Nodes**: [Hetzner Cloud](https://www.hetzner.com/cloud) & [DigitalOcean](https://m.do.co/c/johannschiffer)
   - **Reliable Proxy Pool & IP Rotation**: [Webshare](https://www.webshare.io/) & [Bright Data](https://brightdata.com/)
   - **Documentation & Setup Guides**: [johannschiffer.github.io](https://johannschiffer.github.io/)
+
+---
+
+## Support
+
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/johannschiffer)
+
+If you find this tool helpful, you can support its maintenance via Ko-fi.

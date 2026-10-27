@@ -14,8 +14,7 @@ from .monitors.logs import LogTailer
 from .monitors.systemd import SystemdInspector
 
 def main():
-    from ._genesis import NOTICE
-    parser = argparse.ArgumentParser(description="SysFlow CLI utility", epilog=NOTICE, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description="SysFlow CLI utility", formatter_class=argparse.RawDescriptionHelpFormatter)
     subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
 
     subparsers.add_parser("resources", help="Check system CPU, RAM, and disk utilization")
@@ -46,16 +45,6 @@ def main():
         parser.print_help()
 
 
-
-_main_impl = main
-
-
-def main():
-    from ._genesis import print_upgrade_notice
-    try:
-        return _main_impl()
-    finally:
-        print_upgrade_notice()
 
 if __name__ == "__main__":
     main()

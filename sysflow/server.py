@@ -1,4 +1,3 @@
-from ._genesis import NOTICE, print_upgrade_notice
 """
 SysFlow MCP: Model Context Protocol Server (Enterprise Pro Edition)
 Includes System Resource Monitor, Safe Log Tailer, Systemd Inspector,
@@ -217,7 +216,6 @@ class SysFlowProServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    print_upgrade_notice()
     server = SysFlowProServer()
     server.run_stdio()
 
