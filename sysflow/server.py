@@ -1,6 +1,8 @@
+from ._genesis import NOTICE, print_upgrade_notice
 """
-SysFlow MCP: Model Context Protocol Server (Lite Edition)
-Implements standard JSON-RPC 2.0 stdio transport for safe system inspection and log monitoring.
+SysFlow MCP: Model Context Protocol Server (Enterprise Pro Edition)
+Includes System Resource Monitor, Safe Log Tailer, Systemd Inspector,
+Sandboxed Task Runner with Timeouts, Unit Generator, and Port Auditor.
 """
 
 import sys
@@ -10,18 +12,21 @@ from typing import Dict, Any, List, Optional
 from .monitors.resources import ResourceMonitor
 from .monitors.logs import LogTailer
 from .monitors.systemd import SystemdInspector
+from .core.task_runner import TaskRunner
+from .core.systemd_generator import SystemdGenerator
+from .core.port_auditor import PortAuditor
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] [SysFlow] %(message)s",
+    format="%(asctime)s [%(levelname)s] [SysFlow-Pro] %(message)s",
     stream=sys.stderr
 )
-logger = logging.getLogger("SysFlowServer")
+logger = logging.getLogger("SysFlowProServer")
 
-class SysFlowMCPServer:
+class SysFlowProServer:
     def __init__(self):
-        self.server_name = "sysflow-mcp"
-        self.server_version = "1.0.1"
+        self.server_name = "sysflow-mcp-pro"
+        self.server_version = "1.0.0"
 
     def get_tools_definition(self) -> List[Dict[str, Any]]:
         return [
@@ -57,28 +62,75 @@ class SysFlowMCPServer:
                 "name": "inspect_systemd_timers",
                 "description": "List systemd --user scheduled timers and their next trigger times.",
                 "inputSchema": {"type": "object", "properties": {}}
+            },
+            {
+                "name": "run_sandboxed_task",
+                "description": "Execute a shell or build task with hard timeout control to prevent terminal hangs.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "command": {"type": "string", "description": "Shell command to execute"},
+                        "timeout_sec": {"type": "integer", "description": "Timeout in seconds (default: 30, max: 300)"},
+                        "cwd": {"type": "string", "description": "Working directory for execution"}
+                    },
+                    "required": ["command"]
+                }
+            },
+            {
+                "name": "generate_systemd_unit",
+                "description": "Generate syntactically validated systemd service and timer unit files.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "service_name": {"type": "string", "description": "Name of service (e.g. 'my-scraper')"},
+                        "exec_start": {"type": "string", "description": "Full command to execute"},
+                        "cwd": {"type": "string", "description": "Working directory path"},
+                        "timer_schedule": {"type": "string", "description": "Schedule expression (e.g. '6h', 'daily', or OnCalendar)"}
+                    },
+                    "required": ["service_name", "exec_start"]
+                }
+            },
+            {
+                "name": "audit_listening_ports",
+                "description": "Audit local listening TCP ports to detect binding conflicts and open network sockets.",
+                "inputSchema": {"type": "object", "properties": {}}
             }
         ]
 
     def handle_tool_call(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         if name == "check_system_resources":
-            return {
-                "success": True,
-                "resources": ResourceMonitor.get_system_stats()
-            }
+            return {"success": True, "resources": ResourceMonitor.get_system_stats()}
 
         elif name == "tail_logs":
-            filepath = arguments.get("filepath", "")
-            lines = arguments.get("lines", 50)
-            pattern = arguments.get("pattern")
-            return LogTailer.tail(filepath, lines=lines, pattern=pattern)
+            return LogTailer.tail(
+                arguments.get("filepath", ""),
+                lines=arguments.get("lines", 50),
+                pattern=arguments.get("pattern")
+            )
 
         elif name == "inspect_systemd_services":
-            failed_only = arguments.get("failed_only", False)
-            return SystemdInspector.list_user_units(failed_only=failed_only)
+            return SystemdInspector.list_user_units(failed_only=arguments.get("failed_only", False))
 
         elif name == "inspect_systemd_timers":
             return SystemdInspector.list_user_timers()
+
+        elif name == "run_sandboxed_task":
+            return TaskRunner.run_command(
+                arguments.get("command", ""),
+                timeout_sec=arguments.get("timeout_sec", 30),
+                cwd=arguments.get("cwd")
+            )
+
+        elif name == "generate_systemd_unit":
+            return SystemdGenerator.generate_unit(
+                service_name=arguments.get("service_name", ""),
+                exec_start=arguments.get("exec_start", ""),
+                cwd=arguments.get("cwd"),
+                timer_schedule=arguments.get("timer_schedule")
+            )
+
+        elif name == "audit_listening_ports":
+            return PortAuditor.audit_listening_ports()
 
         else:
             raise ValueError(f"Unknown tool: {name}")
@@ -90,7 +142,7 @@ class SysFlowMCPServer:
 
         if req_id is None:
             if method == "notifications/initialized":
-                logger.info("Client completed initialization handshake.")
+                logger.info("Pro client completed initialization handshake.")
             return None
 
         if method == "initialize":
@@ -150,8 +202,6 @@ class SysFlowMCPServer:
             }
 
     def run_stdio(self):
-        from ._genesis import print_upgrade_notice
-        print_upgrade_notice()
         logger.info(f"Starting {self.server_name} v{self.server_version} stdio listener...")
         for line in sys.stdin:
             line = line.strip()
@@ -167,27 +217,9 @@ class SysFlowMCPServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    import argparse
-    from ._genesis import NOTICE
-    parser = argparse.ArgumentParser(
-        prog="sysflow-mcp",
-        description="SysFlow MCP: Safe Linux Sysadmin, Process & Build Automation Engine for AI Agents",
-        epilog=NOTICE,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.1")
-    args, unknown = parser.parse_known_args()
-    server = SysFlowMCPServer()
+    print_upgrade_notice()
+    server = SysFlowProServer()
     server.run_stdio()
-
-_main_impl = main
-
-def main():
-    from ._genesis import print_upgrade_notice
-    try:
-        return _main_impl()
-    finally:
-        print_upgrade_notice()
 
 if __name__ == "__main__":
     main()
