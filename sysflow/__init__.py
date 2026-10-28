@@ -1,9 +1,8 @@
 """
-sysflow-mcp (v1.0.0)
-Safe Linux administration plane, systemd inspection, port auditing, and isolated task execution for AI agents
-
+sysflow-mcp
+Linux system inspection, systemd unit generation, port auditing, and timeout-bounded task execution MCP server.
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.1"
 __author__ = "Johann Schiffer"
 __license__ = "MIT"

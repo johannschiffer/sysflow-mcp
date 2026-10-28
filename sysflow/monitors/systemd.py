@@ -2,8 +2,10 @@
 Systemd User Service & Timer Inspector.
 Inspects systemd --user units, detects failed services, and monitors timers without root.
 """
+
 import subprocess
 from typing import Dict, Any, List
+
 
 class SystemdInspector:
     @staticmethod
@@ -14,27 +16,32 @@ class SystemdInspector:
 
         try:
             res = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
-            units: List[Dict[str, str]] = []
+            if res.returncode != 0:
+                err_msg = (res.stderr or res.stdout or f"systemctl exited {res.returncode}").strip()
+                return {"success": False, "error": f"systemctl --user failed: {err_msg}", "units": []}
 
+            units: List[Dict[str, str]] = []
             for line in res.stdout.strip().split("\n"):
                 line = line.strip()
                 if not line:
                     continue
                 parts = line.split(maxsplit=4)
                 if len(parts) >= 4:
-                    units.append({
-                        "unit": parts[0].replace("●", "").strip(),
-                        "load": parts[1],
-                        "active": parts[2],
-                        "sub": parts[3],
-                        "description": parts[4] if len(parts) > 4 else ""
-                    })
+                    units.append(
+                        {
+                            "unit": parts[0].replace("●", "").strip(),
+                            "load": parts[1],
+                            "active": parts[2],
+                            "sub": parts[3],
+                            "description": parts[4] if len(parts) > 4 else "",
+                        }
+                    )
 
             return {
                 "success": True,
                 "count": len(units),
                 "failed_only": failed_only,
-                "units": units
+                "units": units,
             }
         except Exception as e:
             return {"success": False, "error": f"Error querying systemctl: {str(e)}"}
@@ -44,12 +51,11 @@ class SystemdInspector:
         cmd = ["systemctl", "--user", "list-timers", "--no-pager", "--no-legend"]
         try:
             res = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
-            timers = []
-            for line in res.stdout.strip().split("\n"):
-                line = line.strip()
-                if not line:
-                    continue
-                timers.append(line)
+            if res.returncode != 0:
+                err_msg = (res.stderr or res.stdout or f"systemctl exited {res.returncode}").strip()
+                return {"success": False, "error": f"systemctl --user list-timers failed: {err_msg}", "timers": []}
+
+            timers = [line.strip() for line in res.stdout.strip().split("\n") if line.strip()]
             return {"success": True, "count": len(timers), "timers": timers}
         except Exception as e:
             return {"success": False, "error": f"Error querying systemd timers: {str(e)}"}

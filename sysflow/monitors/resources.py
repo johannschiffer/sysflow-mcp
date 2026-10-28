@@ -30,14 +30,15 @@ class ResourceMonitor:
         except Exception:
             pass
 
-        # 3. RAM (Linux /proc/meminfo)
         mem_total_mb = 0
         mem_avail_mb = 0
         mem_pct = 0.0
-        if os.path.exists("/proc/meminfo"):
+        proc_root = os.getenv("SYSFLOW_PROC_DIR") or ("/host-proc" if os.path.isfile("/host-proc/meminfo") else "/proc")
+        meminfo_path = os.path.join(proc_root, "meminfo")
+        if os.path.exists(meminfo_path):
             try:
                 mem_dict = {}
-                with open("/proc/meminfo", "r") as f:
+                with open(meminfo_path, "r") as f:
                     for line in f:
                         parts = line.split(":")
                         if len(parts) == 2:

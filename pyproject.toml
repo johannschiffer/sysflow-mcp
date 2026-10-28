@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sysflow-mcp"
-version = "1.0.0"
-description = "Safe Linux administration plane, systemd inspection, port auditing, and isolated task execution for AI agents"
+version = "2.0.1"
+description = "Linux system inspection, systemd unit generation, port auditing, and timeout-bounded task execution MCP server"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Johann Schiffer"}
 ]
@@ -24,6 +24,9 @@ sysflow-cli = "sysflow.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["sysflow*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [project.urls]
 Homepage = "https://github.com/johannschiffer/sysflow-mcp"

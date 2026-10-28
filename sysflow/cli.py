@@ -1,20 +1,26 @@
 """
-SysFlow CLI testing utility.
+SysFlow CLI utility.
 Usage:
-  python -m sysflow.cli resources
-  python -m sysflow.cli tail /var/log/syslog --lines 20
-  python -m sysflow.cli systemd --failed
+  sysflow-cli resources
+  sysflow-cli tail /var/log/syslog --lines 20
+  sysflow-cli systemd --failed
 """
 
 import argparse
 import json
-import sys
+from . import __version__
 from .monitors.resources import ResourceMonitor
 from .monitors.logs import LogTailer
 from .monitors.systemd import SystemdInspector
 
+
 def main():
-    parser = argparse.ArgumentParser(description="SysFlow CLI utility", formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        prog="sysflow-cli",
+        description="SysFlow CLI utility",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("-v", "--version", action="version", version=f"sysflow-mcp {__version__}")
     subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
 
     subparsers.add_parser("resources", help="Check system CPU, RAM, and disk utilization")
@@ -32,18 +38,14 @@ def main():
     if args.command == "resources":
         stats = ResourceMonitor.get_system_stats()
         print(json.dumps(stats, indent=2))
-
     elif args.command == "tail":
         res = LogTailer.tail(args.file, lines=args.lines, pattern=args.pattern)
         print(json.dumps(res, indent=2))
-
     elif args.command == "systemd":
         res = SystemdInspector.list_user_units(failed_only=args.failed)
         print(json.dumps(res, indent=2))
-
     else:
         parser.print_help()
-
 
 
 if __name__ == "__main__":

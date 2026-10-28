@@ -1,13 +1,15 @@
 """
 SysFlow MCP: Model Context Protocol Server
-Includes System Resource Monitor, Safe Log Tailer, Systemd Inspector,
-Sandboxed Task Runner with Timeouts, Unit Generator, and Port Auditor.
+Provides system resource metrics, path-guarded log tailing, systemd --user inspection,
+timeout-bounded argv execution, systemd unit generation, and TCP port auditing over stdio.
 """
 
 import sys
 import json
 import logging
+import argparse
 from typing import Dict, Any, List, Optional
+from . import __version__
 from .monitors.resources import ResourceMonitor
 from .monitors.logs import LogTailer
 from .monitors.systemd import SystemdInspector
@@ -18,34 +20,35 @@ from .core.port_auditor import PortAuditor
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] [SysFlow] %(message)s",
-    stream=sys.stderr
+    stream=sys.stderr,
 )
 logger = logging.getLogger("SysFlowServer")
+
 
 class SysFlowServer:
     def __init__(self):
         self.server_name = "sysflow-mcp"
-        self.server_version = "1.0.0"
+        self.server_version = __version__
 
     def get_tools_definition(self) -> List[Dict[str, Any]]:
         return [
             {
                 "name": "check_system_resources",
                 "description": "Inspect CPU load average, RAM utilization, and disk partition space.",
-                "inputSchema": {"type": "object", "properties": {}}
+                "inputSchema": {"type": "object", "properties": {}},
             },
             {
                 "name": "tail_logs",
-                "description": "Safely read recent lines from a log or text file with optional regex filtering.",
+                "description": "Safely read recent lines from an allowed log or text file with optional regex filtering.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "filepath": {"type": "string", "description": "Absolute or relative path to log file"},
+                        "filepath": {"type": "string", "description": "Path to log file within allowed directories"},
                         "lines": {"type": "integer", "description": "Number of recent lines to retrieve (default: 50, max: 500)"},
-                        "pattern": {"type": "string", "description": "Optional regex pattern to filter lines"}
+                        "pattern": {"type": "string", "description": "Optional regex pattern to filter lines"},
                     },
-                    "required": ["filepath"]
-                }
+                    "required": ["filepath"],
+                },
             },
             {
                 "name": "inspect_systemd_services",
@@ -54,46 +57,46 @@ class SysFlowServer:
                     "type": "object",
                     "properties": {
                         "failed_only": {"type": "boolean", "description": "Only return units in failed state (default: false)"}
-                    }
-                }
+                    },
+                },
             },
             {
                 "name": "inspect_systemd_timers",
                 "description": "List systemd --user scheduled timers and their next trigger times.",
-                "inputSchema": {"type": "object", "properties": {}}
+                "inputSchema": {"type": "object", "properties": {}},
             },
             {
                 "name": "run_sandboxed_task",
-                "description": "Execute a shell or build task with hard timeout control to prevent terminal hangs.",
+                "description": "Execute a non-interactive argv command with hard timeout and process-group cleanup.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "command": {"type": "string", "description": "Shell command to execute"},
+                        "command": {"type": "string", "description": "Command and arguments to execute"},
                         "timeout_sec": {"type": "integer", "description": "Timeout in seconds (default: 30, max: 300)"},
-                        "cwd": {"type": "string", "description": "Working directory for execution"}
+                        "cwd": {"type": "string", "description": "Working directory for execution"},
                     },
-                    "required": ["command"]
-                }
+                    "required": ["command"],
+                },
             },
             {
                 "name": "generate_systemd_unit",
-                "description": "Generate syntactically validated systemd service and timer unit files.",
+                "description": "Generate validated systemd .service and .timer unit files.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
                         "service_name": {"type": "string", "description": "Name of service (e.g. 'my-scraper')"},
                         "exec_start": {"type": "string", "description": "Full command to execute"},
                         "cwd": {"type": "string", "description": "Working directory path"},
-                        "timer_schedule": {"type": "string", "description": "Schedule expression (e.g. '6h', 'daily', or OnCalendar)"}
+                        "timer_schedule": {"type": "string", "description": "Schedule expression (e.g. '6h', 'daily', or OnCalendar)"},
                     },
-                    "required": ["service_name", "exec_start"]
-                }
+                    "required": ["service_name", "exec_start"],
+                },
             },
             {
                 "name": "audit_listening_ports",
-                "description": "Audit local listening TCP ports to detect binding conflicts and open network sockets.",
-                "inputSchema": {"type": "object", "properties": {}}
-            }
+                "description": "Audit local listening TCPv4/TCPv6 ports to detect binding conflicts.",
+                "inputSchema": {"type": "object", "properties": {}},
+            },
         ]
 
     def handle_tool_call(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
@@ -104,7 +107,7 @@ class SysFlowServer:
             return LogTailer.tail(
                 arguments.get("filepath", ""),
                 lines=arguments.get("lines", 50),
-                pattern=arguments.get("pattern")
+                pattern=arguments.get("pattern"),
             )
 
         elif name == "inspect_systemd_services":
@@ -117,7 +120,7 @@ class SysFlowServer:
             return TaskRunner.run_command(
                 arguments.get("command", ""),
                 timeout_sec=arguments.get("timeout_sec", 30),
-                cwd=arguments.get("cwd")
+                cwd=arguments.get("cwd"),
             )
 
         elif name == "generate_systemd_unit":
@@ -125,7 +128,7 @@ class SysFlowServer:
                 service_name=arguments.get("service_name", ""),
                 exec_start=arguments.get("exec_start", ""),
                 cwd=arguments.get("cwd"),
-                timer_schedule=arguments.get("timer_schedule")
+                timer_schedule=arguments.get("timer_schedule"),
             )
 
         elif name == "audit_listening_ports":
@@ -135,14 +138,21 @@ class SysFlowServer:
             raise ValueError(f"Unknown tool: {name}")
 
     def handle_request(self, request: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        req_id = request.get("id")
-        method = request.get("method")
-        params = request.get("params", {})
+        if not isinstance(request, dict):
+            return {
+                "jsonrpc": "2.0",
+                "id": None,
+                "error": {"code": -32600, "message": "Invalid Request"},
+            }
 
-        if req_id is None:
+        method = request.get("method")
+        if "id" not in request or request.get("id") is None:
             if method == "notifications/initialized":
                 logger.info("Client completed initialization handshake.")
             return None
+
+        req_id = request.get("id")
+        params = request.get("params") or {}
 
         if method == "initialize":
             return {
@@ -153,9 +163,9 @@ class SysFlowServer:
                     "capabilities": {"tools": {}},
                     "serverInfo": {
                         "name": self.server_name,
-                        "version": self.server_version
-                    }
-                }
+                        "version": self.server_version,
+                    },
+                },
             }
 
         elif method == "ping":
@@ -165,12 +175,12 @@ class SysFlowServer:
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
-                "result": {"tools": self.get_tools_definition()}
+                "result": {"tools": self.get_tools_definition()},
             }
 
         elif method == "tools/call":
             tool_name = params.get("name")
-            tool_args = params.get("arguments", {})
+            tool_args = params.get("arguments") or {}
             try:
                 output = self.handle_tool_call(tool_name, tool_args)
                 return {
@@ -180,24 +190,24 @@ class SysFlowServer:
                         "content": [
                             {
                                 "type": "text",
-                                "text": json.dumps(output, indent=2, ensure_ascii=False)
+                                "text": json.dumps(output, indent=2, ensure_ascii=False),
                             }
                         ],
-                        "isError": not output.get("success", True) if "success" in output else False
-                    }
+                        "isError": not output.get("success", True) if "success" in output else False,
+                    },
                 }
             except Exception as e:
                 logger.error(f"Error calling tool {tool_name}: {e}")
                 return {
                     "jsonrpc": "2.0",
                     "id": req_id,
-                    "error": {"code": -32000, "message": str(e)}
+                    "error": {"code": -32000, "message": str(e)},
                 }
         else:
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
-                "error": {"code": -32601, "message": f"Method not found: {method}"}
+                "error": {"code": -32601, "message": f"Method not found: {method}"},
             }
 
     def run_stdio(self):
@@ -208,6 +218,14 @@ class SysFlowServer:
                 continue
             try:
                 request = json.loads(line)
+            except json.JSONDecodeError as e:
+                sys.stdout.write(
+                    json.dumps({"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": f"Parse error: {e}"}})
+                    + "\n"
+                )
+                sys.stdout.flush()
+                continue
+            try:
                 response = self.handle_request(request)
                 if response is not None:
                     sys.stdout.write(json.dumps(response) + "\n")
@@ -215,9 +233,14 @@ class SysFlowServer:
             except Exception as e:
                 logger.error(f"Error processing stdio line: {e}")
 
-def main():
+
+def main(argv: Optional[List[str]] = None):
+    parser = argparse.ArgumentParser(prog="sysflow-mcp", description="SysFlow Model Context Protocol stdio server")
+    parser.add_argument("-v", "--version", action="version", version=f"sysflow-mcp {__version__}")
+    parser.parse_args(argv)
     server = SysFlowServer()
     server.run_stdio()
+
 
 if __name__ == "__main__":
     main()
