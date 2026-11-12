@@ -72,6 +72,27 @@ class TaskRunner:
                 "timed_out": False,
             }
 
+        allowed_raw = os.getenv("SYSFLOW_ALLOWED_COMMANDS", "").strip()
+        if allowed_raw:
+            allowed = {c.strip() for c in allowed_raw.split(",") if c.strip()}
+            if allow_shell:
+                return {
+                    "success": False,
+                    "exit_code": -1,
+                    "command": command,
+                    "error": "SYSFLOW_ALLOWED_COMMANDS cannot be combined with SYSFLOW_ALLOW_SHELL=1.",
+                    "timed_out": False,
+                }
+            executable = os.path.basename(cmd_target[0])
+            if executable not in allowed:
+                return {
+                    "success": False,
+                    "exit_code": -1,
+                    "command": command,
+                    "error": f"Command '{executable}' is not in SYSFLOW_ALLOWED_COMMANDS.",
+                    "timed_out": False,
+                }
+
         timeout = min(max_timeout, max(1, int(timeout_sec)))
         work_dir = cwd if cwd and os.path.isdir(cwd) else os.getcwd()
         env = _scrubbed_env()

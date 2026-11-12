@@ -51,3 +51,18 @@ def test_systemd_generator_oncalendar_vs_interval_and_injection_guard():
 
     with pytest.raises(ValueError):
         SystemdGenerator.generate_unit("good", "/usr/bin/true\nExecStartPost=/bin/sh")
+
+
+
+def test_allowlist_restricts_executables(monkeypatch):
+    from sysflow.core.task_runner import TaskRunner
+
+    monkeypatch.delenv("SYSFLOW_ALLOW_SHELL", raising=False)
+    monkeypatch.setenv("SYSFLOW_ALLOWED_COMMANDS", "echo")
+    ok = TaskRunner.run_command("echo hi")
+    assert ok["success"] is True
+    denied = TaskRunner.run_command("ls /")
+    assert denied["success"] is False
+    assert "SYSFLOW_ALLOWED_COMMANDS" in denied["error"]
+    monkeypatch.setenv("SYSFLOW_ALLOW_SHELL", "1")
+    assert TaskRunner.run_command("echo hi")["success"] is False
