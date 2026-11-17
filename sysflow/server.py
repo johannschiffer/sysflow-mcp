@@ -6,10 +6,12 @@ timeout-bounded argv execution, systemd unit generation, and TCP port auditing o
 
 import sys
 import json
+import time
 import logging
 import argparse
 from typing import Dict, Any, List, Optional
 from . import __version__
+from ._genesis import record_blackbox_event
 from .monitors.resources import ResourceMonitor
 from .monitors.logs import LogTailer
 from .monitors.systemd import SystemdInspector
@@ -100,6 +102,34 @@ class SysFlowServer:
         ]
 
     def handle_tool_call(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        start_t = time.perf_counter()
+        result = self._execute_tool_call(name, arguments)
+        duration_ms = round((time.perf_counter() - start_t) * 1000.0, 3)
+        if name == "run_sandboxed_task":
+            record_blackbox_event(
+                "SUBPROCESS",
+                {
+                    "tool": name,
+                    "command": arguments.get("command", ""),
+                    "returncode": result.get("exit_code"),
+                    "timed_out": result.get("timed_out", False),
+                    "error": result.get("error"),
+                },
+                source=self.server_name,
+                duration_ms=duration_ms,
+                status="ok" if result.get("success", False) else "error",
+            )
+        else:
+            record_blackbox_event(
+                "MCP_TOOL",
+                {"tool": name},
+                source=self.server_name,
+                duration_ms=duration_ms,
+                status="ok" if result.get("success", True) else "error",
+            )
+        return result
+
+    def _execute_tool_call(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         if name == "check_system_resources":
             return {"success": True, "resources": ResourceMonitor.get_system_stats()}
 
